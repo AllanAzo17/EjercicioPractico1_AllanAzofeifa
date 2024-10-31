@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>Gestión de Árboles</title>
+    </head>
+    <body>
+        <section th:fragment="botonesAgregar" class="py-4 mb-4 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">   
+                        <button 
+                            type="button" 
+                            class="btn btn-primary btn-block" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#agregarFarmacia">
+                            <i class="fas fa-plus"></i> [[#{Farmacia.agregar}]]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Fragmento para agregar un árbol (ventana modal) -->
+        <section th:fragment="agregarFarmacia">
+            <div id="agregarFarmacia" 
+                 class="modal fade" 
+                 tabindex="-1" 
+                 aria-labelledby="exampleModalLabel" 
+                 aria-hidden="true">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title">[[#{Farmacia.agregar}]]</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div> 
+                        <form th:action="@{/Farmacia/guardar}" th:object="${Farmacia}"
+                              method="POST" class="was-validated" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="nombreComun">[[#{Farmacia.nombreComun}]]</label>
+                                    <input type="text" class="form-control" name="nombreComun" required="true"/>
+                                </div>
+                                <div class="mb-3">
+                                    
+                                    <label for="tipoFlor">[[#{Farmacia.tipoFlor}]]</label>
+                                    <input type="text" class="form-control" name="tipoFlor"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="durezaMadera">[[#{Farmacia.durezaMadera}]]</label>
+                                    <input type="text" class="form-control" name="durezaMadera"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="alturaPromedio">[[#{Farmacia.alturaPromedio}]]</label>
+                                    <input type="number" step="0.01" class="form-control" name="alturaPromedio"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="imagen">[[#{Farmacia.rutaImagen}]]</label>
+                                    <input class="form-control" type="file" name="imagenFile" onchange="readURL(this);"/>
+                                    <img id="blah" src="#" alt="your image" height="200"/>
+                                    <img id="blah" src="#" alt="Vista previa de la imagen" height="200"/>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" type="submit">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section th:fragment="listadoFarmacias" id="Farmacias">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>[[#{Farmacia.listado}]]</h4>
+                            </div>
+                            <div th:if="${Farmacias != null and !Farmacias.empty}">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr><th>#</th>
+                                            <th>[[#{Farmacia.nombreComun}]]</th>
+                                            <th>[[#{Farmacia.tipoFlor}]]</th>
+                                            <th>[[#{Farmacia.durezaMadera}]]</th>
+                                            <th>[[#{Farmacia.alturaPromedio}]]</th>
+                                            <th>Imagen</th>
+                                            <th>Acciones</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="Farmacia, contador : ${farmacias}">
+                                            <td>[[${Farmacia.nombreComun}]]</td>
+                                            <td>[[${Farmacia.tipoFlor}]]</td>
+                                            <td>[[${Farmacia.durezaMadera}]]</td>
+                                            <td>[[${Farmacia.alturaPromedio}]]</td>
+                                            <td><img th:src="@{${Farmacia.rutaImagen}}" alt="Imagen del árbol" height="100"/></td>
+                                            <td>
+                                                <a th:href="@{/Farmacia/eliminar/}+${Farmacia.FarmaciaId}" class="btn btn-danger">
+                                                    <i class="fas fa-trash"></i> [[#{accion.eliminar}]]
+                                                </a>
+                                                <a th:href="@{/Farmacia/modificar/}+${Farmacia.FarmaciaId}" class="btn btn-success">
+                                                    <i class="fas fa-pencil"></i> [[#{accion.actualizar}]]
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-center p-2" th:if="${Farmacias == null or Farmacias.empty}">
+                                <span>[[#{lista.vacia}]]</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center bg-success text-white mb-3">
+                            <div class="card-body">
+                                <h3>[[#{Farmacia.total}]]</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Fragmento para la página de editar un árbol -->
+        <section th:fragment="editarFarmacia">
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-8">
+                    <form method="POST"
+                          th:action="@{/Farmacia/guardar}" 
+                          th:object="${Farmacia}"
+                          class="was-validated"                          
+                          enctype="multipart/form-data">
+                        <input type="hidden" name="FarmaciaId" th:field="*{FarmaciaId}"/>
+                        <input type="hidden" name="rutaImagen" th:field="*{rutaImagen}"/>
+                        <div id=details>
+                        <section th:replace="~{Farmacia/fragmentos :: botonesEditar}"/>
+                        <div id="details">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4>[[#{accion.actualizar}]]</h4>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <label for="nombreComun">[[#{Farmacia.nombreComun}]]</label>
+                                                    <input type="text" class="form-control" 
+                                                           name="nombreComun" th:field="*{nombreComun}"
+                                                           required="true">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="tipoFlor">[[#{Farmacia.tipoFlor}]]</label>
+                                                    <input type="text" class="form-control" name="tipoFlor" th:field="*{tipoFlor}"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="durezaMadera">[[#{Farmacia.durezaMadera}]]</label>
+                                                    <input type="text" class="form-control" name="durezaMadera" th:field="*{durezaMadera}"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="alturaPromedio">[[#{Farmacia.alturaPromedio}]]</label>
+                                                    <input type="number" step="0.01" class="form-control" 
+                                                           name="alturaPromedio" th:field="*{alturaPromedio}"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                
+                                                    <label for="imagen">[[#{Farmacia.rutaImagen}]]</label>
+                                                    <input class="form-control" type="file" name="imagenFile"
+                                                           onchange="readURL(this);" />
+    
+                                                    <img id="blah" th:src="@{${Farmacia.rutaImagen}}" alt="Imagen del árbol" height="200"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5 Fragmento que se utiliza en el fragmento anterior -->
+        <!-- 5. Botones en la página de edición del árbol -->
+        <section th:fragment="botonesEditar">
+            <div class="container py-4 mb-4 bg-light">
+                <div class="row">
+                    <div class="col-md-4 d-grid">
+                        <a th:href="@{/Farmacia/listado}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> [[#{accion.regresar}]]
+                        </a>
+                    </div>
+                    <div class="col-md-4 d-grid">                               
+                        <a th:href="@{/Farmacia/eliminar/}+${Farmacia.FarmaciaId}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> [[#{accion.eliminar}]]
+                        </a>
+                    </div>
+                    <div class="col-md-4 d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> [[#{accion.guardar}]]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>
