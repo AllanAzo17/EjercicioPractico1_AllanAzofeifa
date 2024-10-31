@@ -10,27 +10,30 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="farmacia")
+@Table(name="categoria")
 public class Farmacia implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id_farmacia")
+    @Column(name="id")
     private Long idFarmacia;
     private String descripcion;
-    private String rutaImagen;
+    
     
 
     public Farmacia() {
     }
 
-    public Farmacia(Long idFarmacia, String descripcion, String rutaImagen) {
+    public Farmacia(Long idFarmacia, String descripcion) {
         this.idFarmacia = idFarmacia;
         this.descripcion = descripcion;
-        this.rutaImagen = rutaImagen;
     }
+    
+    
+
+
 
     
 

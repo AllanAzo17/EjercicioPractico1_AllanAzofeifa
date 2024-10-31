@@ -6,7 +6,6 @@ package EjercicioPractico1_AllanAzofeifa.demo.controller;
 
 import EjercicioPractico1_AllanAzofeifa.demo.domain.Farmacia;
 import EjercicioPractico1_AllanAzofeifa.demo.Service.FarmaciaService;
-import EjercicioPractico1_AllanAzofeifa.demo.impl.FirebaseStorageServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @Slf4j
-@RequestMapping("/farmacia")
+@RequestMapping("/Farmacia")
 
 
 public class farmaciaController {
@@ -38,20 +37,6 @@ public class farmaciaController {
     @GetMapping("/nuevo")
     public String FarmaciaNuevo(Farmacia Farmacia) {
         return "/Farmacia/modifica";
-    }
-    @Autowired
-    private FirebaseStorageServiceImpl firebaseStorageService;
-    
-    @PostMapping("/guardar")
-    public String FarmaciaGuardar(Farmacia Farmacia,
-            @RequestParam("imagenFile") MultipartFile imagenFile) {        
-        if (!imagenFile.isEmpty()) {
-            FarmaciaService.save(Farmacia);
-            Farmacia.setRutaImagen(
-                    firebaseStorageService.cargaImagen(imagenFile, "Farmacia" ,Farmacia.getIdFarmacia()));
-        }
-        FarmaciaService.save(Farmacia);
-        return "redirect:/Farmacia/listado";
     }
     
 
